@@ -1,0 +1,61 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1440" height="900" viewBox="0 0 1440 900" role="img" aria-labelledby="title desc">
+  <title id="title">DSH Plugin Registry architecture</title>
+  <desc id="desc">A diagram showing plugin manifests entering a central verified registry and being consumed by command line, continuous integration, and Agent Skill clients.</desc>
+  <rect width="1440" height="900" fill="#f5f7f2"/>
+  <path d="M0 0h1440v20H0z" fill="#c8f542"/>
+  <path d="M1180 20h260v10h-260z" fill="#18b8cf"/>
+
+  <g font-family="Arial, Helvetica, sans-serif">
+    <text x="88" y="112" fill="#151812" font-size="22" font-weight="700">DSH / INFRASTRUCTURE</text>
+    <text x="88" y="178" fill="#151812" font-size="62" font-weight="800">PLUGIN REGISTRY</text>
+    <text x="90" y="224" fill="#566052" font-size="22">Context-aware identity and conflict checks</text>
+
+    <text x="90" y="332" fill="#566052" font-size="16" font-weight="700">01 / DECLARE</text>
+    <rect x="88" y="360" width="300" height="316" rx="6" fill="#ffffff" stroke="#151812" stroke-width="3"/>
+    <rect x="108" y="384" width="260" height="58" rx="4" fill="#e9edd9"/>
+    <text x="132" y="420" fill="#151812" font-size="19" font-weight="700">plugin-a / manifest</text>
+    <rect x="108" y="456" width="260" height="58" rx="4" fill="#dff4f7"/>
+    <text x="132" y="492" fill="#151812" font-size="19" font-weight="700">plugin-b / manifest</text>
+    <rect x="108" y="528" width="260" height="58" rx="4" fill="#f6e0ea"/>
+    <text x="132" y="564" fill="#151812" font-size="19" font-weight="700">plugin-c / manifest</text>
+    <text x="112" y="626" fill="#566052" font-size="16">Pinned source commit</text>
+    <text x="112" y="652" fill="#566052" font-size="16">Harness compatibility range</text>
+
+    <path d="M406 514h80" stroke="#151812" stroke-width="4"/>
+    <path d="m474 500 16 14-16 14" fill="none" stroke="#151812" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+
+    <text x="514" y="332" fill="#566052" font-size="16" font-weight="700">02 / VERIFY</text>
+    <rect x="512" y="360" width="410" height="316" rx="6" fill="#151812"/>
+    <rect x="540" y="392" width="354" height="72" rx="4" fill="#c8f542"/>
+    <text x="568" y="422" fill="#151812" font-size="14" font-weight="700">CONTRACT</text>
+    <text x="568" y="450" fill="#151812" font-size="22" font-weight="800">dsh-plugin-registry/v2</text>
+    <circle cx="566" cy="512" r="8" fill="#18b8cf"/>
+    <text x="590" y="519" fill="#ffffff" font-size="18">Schema + bounded input</text>
+    <circle cx="566" cy="558" r="8" fill="#ff6da9"/>
+    <text x="590" y="565" fill="#ffffff" font-size="18">Context-aware conflicts</text>
+    <circle cx="566" cy="604" r="8" fill="#c8f542"/>
+    <text x="590" y="611" fill="#ffffff" font-size="18">Deterministic index</text>
+    <text x="782" y="648" fill="#aeb8a8" font-size="14">FAIL CLOSED</text>
+
+    <path d="M940 514h80" stroke="#151812" stroke-width="4"/>
+    <path d="m1008 500 16 14-16 14" fill="none" stroke="#151812" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+
+    <text x="1048" y="332" fill="#566052" font-size="16" font-weight="700">03 / CONSUME</text>
+    <rect x="1046" y="360" width="306" height="316" rx="6" fill="#ffffff" stroke="#151812" stroke-width="3"/>
+    <rect x="1068" y="384" width="262" height="66" rx="4" fill="#151812"/>
+    <text x="1094" y="425" fill="#ffffff" font-size="20" font-weight="700">CLI / SEARCH</text>
+    <rect x="1068" y="466" width="262" height="66" rx="4" fill="#18b8cf"/>
+    <text x="1094" y="507" fill="#102025" font-size="20" font-weight="700">CI / CHECK</text>
+    <rect x="1068" y="548" width="262" height="66" rx="4" fill="#ff6da9"/>
+    <text x="1094" y="589" fill="#25121a" font-size="20" font-weight="700">SKILL / PLAN</text>
+    <text x="1072" y="650" fill="#566052" font-size="15">Known conflict or unknown</text>
+
+    <line x1="88" y1="748" x2="1352" y2="748" stroke="#bac2b5" stroke-width="2"/>
+    <text x="88" y="792" fill="#151812" font-size="16" font-weight="700">IDENTITY</text>
+    <text x="218" y="792" fill="#566052" font-size="16">package / loader / service / tool / skill / event / route</text>
+    <text x="88" y="834" fill="#151812" font-size="16" font-weight="700">BOUNDARY</text>
+    <text x="218" y="834" fill="#566052" font-size="16">Discovery is evidence, not reservation</text>
+    <rect x="1144" y="778" width="208" height="56" rx="4" fill="#c8f542"/>
+    <text x="1174" y="813" fill="#151812" font-size="17" font-weight="800">SOURCE VERIFIED</text>
+  </g>
+</svg>

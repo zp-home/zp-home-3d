@@ -1,0 +1,75 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 600" width="960" height="600" role="img" aria-label="FS_STALE_VERSION 确定性重试流程">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#101319"/>
+      <stop offset="1" stop-color="#161a22"/>
+    </linearGradient>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#5b6474"/>
+    </marker>
+    <marker id="arrowOk" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#3fb984"/>
+    </marker>
+  </defs>
+
+  <rect width="960" height="600" fill="url(#bg)"/>
+  <g stroke="#ffffff" stroke-opacity="0.04">
+    <path d="M40 0V600M120 0V600M200 0V600M280 0V600M360 0V600M440 0V600M520 0V600M600 0V600M680 0V600M760 0V600M840 0V600M920 0V600"/>
+    <path d="M0 40H960M0 120H960M0 200H960M0 280H960M0 360H960M0 440H960M0 520H960"/>
+  </g>
+
+  <text x="64" y="86" fill="#e6e9ef" font-family="'JetBrains Mono', ui-monospace, monospace" font-size="30" font-weight="600">FS_STALE_VERSION</text>
+  <text x="64" y="122" fill="#8a93a3" font-family="ui-sans-serif, system-ui, sans-serif" font-size="19">两个会话同改一个文件时，不再依赖模型自己重读重试</text>
+
+  <!-- session lanes -->
+  <g font-family="'JetBrains Mono', ui-monospace, monospace" font-size="14">
+    <rect x="64" y="176" width="176" height="52" rx="6" fill="#1c2029" stroke="#2c3341"/>
+    <text x="84" y="200" fill="#c6ccd7" font-size="14">session A</text>
+    <text x="84" y="219" fill="#7b8494" font-size="12.5">edit(file, old_string)</text>
+
+    <rect x="64" y="252" width="176" height="52" rx="6" fill="#1c2029" stroke="#2c3341"/>
+    <text x="84" y="276" fill="#c6ccd7" font-size="14">session B</text>
+    <text x="84" y="295" fill="#7b8494" font-size="12.5">已写盘，版本前进</text>
+  </g>
+
+  <path d="M240 202 H312" stroke="#5b6474" stroke-width="1.6" fill="none" marker-end="url(#arrow)"/>
+  <path d="M240 278 H288 V212" stroke="#3a4250" stroke-width="1.6" fill="none" stroke-dasharray="4 4"/>
+
+  <!-- failure -->
+  <rect x="312" y="176" width="212" height="52" rx="6" fill="#2a1a1a" stroke="#7a3b34"/>
+  <text x="332" y="200" fill="#ef8e7f" font-family="'JetBrains Mono', ui-monospace, monospace" font-size="14">✗ FS_STALE_VERSION</text>
+  <text x="332" y="219" fill="#9b7a73" font-family="'JetBrains Mono', ui-monospace, monospace" font-size="12.5">编辑被拒绝，版本已过期</text>
+
+  <!-- plugin box -->
+  <rect x="312" y="264" width="584" height="176" rx="10" fill="#141922" stroke="#33425c"/>
+  <text x="336" y="296" fill="#7fb2ff" font-family="'JetBrains Mono', ui-monospace, monospace" font-size="14">tools/execute · dsh-best-dev-optimizer</text>
+
+  <g font-family="'JetBrains Mono', ui-monospace, monospace" font-size="13.5">
+    <rect x="336" y="316" width="240" height="46" rx="6" fill="#1b2230" stroke="#33425c"/>
+    <text x="356" y="337" fill="#cfd6e2">1 · 内部补一次 read</text>
+    <text x="356" y="354" fill="#78839a" font-size="12">刷新该会话的观察版本号</text>
+
+    <rect x="620" y="316" width="240" height="46" rx="6" fill="#1b2230" stroke="#33425c"/>
+    <text x="640" y="337" fill="#cfd6e2">2 · 重放原始 edit</text>
+    <text x="640" y="354" fill="#78839a" font-size="12">锚点文本仍唯一即落地</text>
+
+    <path d="M576 339 H612" stroke="#5b6474" stroke-width="1.6" fill="none" marker-end="url(#arrow)"/>
+
+    <text x="336" y="398" fill="#7b8494" font-size="12.5">锚点被改掉 → 真实冲突照常抛给模型（FS_EDIT_NOT_FOUND / FS_AMBIGUOUS_EDIT）</text>
+    <text x="336" y="420" fill="#7b8494" font-size="12.5">write 默认不重放 —— 整文件覆盖会静默吞掉别人刚写的内容</text>
+  </g>
+
+  <path d="M418 228 V264" stroke="#5b6474" stroke-width="1.6" fill="none" marker-end="url(#arrow)"/>
+
+  <!-- success -->
+  <rect x="620" y="176" width="276" height="52" rx="6" fill="#152520" stroke="#2f6b52"/>
+  <text x="640" y="200" fill="#6fd3a6" font-family="'JetBrains Mono', ui-monospace, monospace" font-size="14">✓ 编辑落地，无丢失更新</text>
+  <text x="640" y="219" fill="#6f9186" font-family="'JetBrains Mono', ui-monospace, monospace" font-size="12.5">恢复过程与模型行为无关</text>
+  <path d="M740 316 V232" stroke="#3fb984" stroke-width="1.6" fill="none" marker-end="url(#arrowOk)"/>
+
+  <g font-family="'JetBrains Mono', ui-monospace, monospace" font-size="12.5" fill="#5f6878">
+    <text x="64" y="492">Cordis plugin</text>
+    <text x="64" y="514">peer: @deepseek-ai/dsh-tools · dsh-llm</text>
+    <text x="64" y="536">retry once · 可配置 tools 白名单 · onRecovered 回调</text>
+  </g>
+</svg>

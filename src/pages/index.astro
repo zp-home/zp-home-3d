@@ -1,0 +1,1090 @@
+---
+import { getCollection } from 'astro:content'
+import {
+  ArrowLeft,
+  ArrowRight,
+  Code2,
+  Expand,
+  Github,
+  Pause,
+  Play,
+  ScanSearch,
+  ShieldCheck,
+  Workflow,
+} from 'lucide-astro'
+import '@fontsource-variable/dm-sans'
+import '@fontsource-variable/jetbrains-mono'
+import { site } from '../data/site'
+import { byNewest } from '../utils/content'
+
+const projects = (await getCollection('projects')).sort(byNewest)
+const skills = await getCollection('skills')
+const knowledge = await getCollection('knowledge')
+
+const projectById = (id: string) => projects.find((project) => project.id === id)
+const selectedProjects = [
+  projectById('dsh-desktop'),
+  projectById('dsh-recommend'),
+  projectById('xiaocar-hand-detection'),
+].filter((project) => project !== undefined)
+const recommend = projectById('dsh-recommend')
+const base = import.meta.env.BASE_URL.endsWith('/') ? import.meta.env.BASE_URL : `${import.meta.env.BASE_URL}/`
+const asset = (path: string | undefined) => (path ? `${base}${path.replace(/^\/+/, '')}` : undefined)
+const mainSite = site.home
+
+const slideLabels = ['开场', '工作系统', '项目切面', '审计案例', '工程边界', '能力图谱', '继续探索']
+const projectCount = String(projects.length).padStart(2, '0')
+const skillCount = String(skills.length).padStart(2, '0')
+const knowledgeCount = String(knowledge.length).padStart(2, '0')
+---
+
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="description" content="zp-home 的交互式项目与技术演示文稿。" />
+    <meta name="theme-color" content="#090b0a" />
+    <link rel="icon" type="image/svg+xml" href={asset('/favicon.svg')} />
+    <title>zp-home / Interactive portfolio</title>
+  </head>
+  <body>
+    <a class="skip-link" href="#deck">跳到演示内容</a>
+
+    <div class="stage" data-scene="0">
+      <canvas id="world-canvas" aria-hidden="true"></canvas>
+      <div class="stage__grain" aria-hidden="true"></div>
+
+      <header class="deck-header">
+        <a class="brand" href={mainSite} aria-label="返回 zp-home 首页">
+          <span class="brand__mark">zp</span>
+          <span class="brand__meta">Interactive portfolio<br />2026 / CN</span>
+        </a>
+
+        <div class="deck-tools">
+          <span class="system-status"><i></i> LIVE WEBGL</span>
+          <button class="icon-button" id="motion-toggle" type="button" title="暂停动画" aria-label="暂停动画">
+            <Pause class="pause-icon" size={18} aria-hidden="true" />
+            <Play class="play-icon" size={18} aria-hidden="true" />
+          </button>
+          <button class="icon-button" id="fullscreen-toggle" type="button" title="全屏" aria-label="进入全屏">
+            <Expand size={18} aria-hidden="true" />
+          </button>
+        </div>
+      </header>
+
+      <nav class="deck-nav" aria-label="演示章节">
+        {slideLabels.map((label, index) => (
+          <button class="deck-nav__item" type="button" data-slide-target={index} aria-label={`第 ${index + 1} 页：${label}`} aria-current={index === 0 ? 'step' : undefined}>
+            <span>{String(index + 1).padStart(2, '0')}</span>
+            <i></i>
+            <em>{label}</em>
+          </button>
+        ))}
+      </nav>
+
+      <main class="deck" id="deck" aria-live="polite">
+        <section class="slide slide--cover is-active" data-slide="0" data-label="开场" aria-hidden="false">
+          <div class="cover-copy">
+            <p class="kicker reveal">INDEPENDENT BUILDER / SYSTEMS PRACTICE</p>
+            <h1 class="reveal">把复杂系统<br /><span>做成可验证的产品</span></h1>
+            <p class="lead reveal">AI 产品、跨平台桌面、Agent Skills 与开源工程。这里不是项目清单，而是一组从问题、实现到证据的工作切面。</p>
+            <div class="cover-actions reveal">
+              <button class="text-button" type="button" data-next>开始浏览 <ArrowRight size={18} aria-hidden="true" /></button>
+              <a class="text-link" href={site.github} target="_blank" rel="noreferrer"><Github size={17} aria-hidden="true" /> GitHub</a>
+            </div>
+          </div>
+
+          <div class="cover-index reveal" aria-label="站点内容概览">
+            <div><strong>{projectCount}</strong><span>PROJECTS</span></div>
+            <div><strong>{skillCount}</strong><span>SKILLS</span></div>
+            <div><strong>{knowledgeCount}</strong><span>NOTES</span></div>
+          </div>
+        </section>
+
+        <section class="slide slide--system" data-slide="1" data-label="工作系统" aria-hidden="true">
+          <div class="slide-heading">
+            <p class="kicker reveal">01 / HOW I WORK</p>
+            <h2 class="reveal">交付不是终点，<br />系统才是。</h2>
+            <p class="slide-copy reveal">一个真实问题先变成可运行的产品，再把解法封装为可复用能力，最后留下能被下一次决策调用的证据。</p>
+          </div>
+
+          <div class="system-map reveal" aria-label="从问题到知识的工作流图">
+            <svg viewBox="0 0 760 440" role="img" aria-labelledby="system-map-title system-map-desc">
+              <title id="system-map-title">zp-home 工作系统</title>
+              <desc id="system-map-desc">问题依次连接产品、技能和知识，并由验证结果形成反馈回路。</desc>
+              <defs>
+                <marker id="arrow-head" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+                  <path d="M 0 0 L 10 5 L 0 10 z" fill="currentColor"></path>
+                </marker>
+              </defs>
+              <path class="map-grid" d="M20 110H740M20 220H740M20 330H740M180 20V420M380 20V420M580 20V420"></path>
+              <path class="map-flow" d="M104 220C154 220 160 118 234 118S314 220 380 220S447 322 526 322S611 220 675 220" marker-end="url(#arrow-head)"></path>
+              <path class="map-return" d="M675 248C633 394 200 410 104 254" marker-end="url(#arrow-head)"></path>
+              <g class="map-node map-node--one" transform="translate(104 220)">
+                <circle r="54"></circle><circle class="map-pulse" r="38"></circle>
+                <text y="-5">01</text><text class="map-label" y="20">问题</text>
+              </g>
+              <g class="map-node map-node--two" transform="translate(234 118)">
+                <circle r="54"></circle><circle class="map-pulse" r="38"></circle>
+                <text y="-5">02</text><text class="map-label" y="20">产品</text>
+              </g>
+              <g class="map-node map-node--three" transform="translate(380 220)">
+                <circle r="54"></circle><circle class="map-pulse" r="38"></circle>
+                <text y="-5">03</text><text class="map-label" y="20">验证</text>
+              </g>
+              <g class="map-node map-node--four" transform="translate(526 322)">
+                <circle r="54"></circle><circle class="map-pulse" r="38"></circle>
+                <text y="-5">04</text><text class="map-label" y="20">Skill</text>
+              </g>
+              <g class="map-node map-node--five" transform="translate(675 220)">
+                <circle r="54"></circle><circle class="map-pulse" r="38"></circle>
+                <text y="-5">05</text><text class="map-label" y="20">知识</text>
+              </g>
+              <text class="map-note" x="294" y="405">EVIDENCE FEEDBACK LOOP</text>
+            </svg>
+            <div class="map-legend">
+              <span><i class="legend-green"></i> 可运行</span>
+              <span><i class="legend-cyan"></i> 可复查</span>
+              <span><i class="legend-red"></i> 有边界</span>
+            </div>
+          </div>
+        </section>
+
+        <section class="slide slide--projects" data-slide="2" data-label="项目切面" aria-hidden="true">
+          <div class="slide-heading slide-heading--row">
+            <div>
+              <p class="kicker reveal">02 / SELECTED WORK</p>
+              <h2 class="reveal">三种问题，<br />同一种工程方法。</h2>
+            </div>
+            <p class="slide-copy reveal">从桌面产品、生态审计到视觉算法，关注的始终是运行路径、失效边界和可验证结果。</p>
+          </div>
+
+          <div class="project-gallery">
+            {selectedProjects.map((project, index) => (
+              <a class="project-panel reveal" href={`${mainSite}projects/${project.id}/`} style={`--delay:${index * 90}ms`}>
+                <div class="project-panel__media">
+                  <img src={asset(project.data.image)} alt="" loading="lazy" />
+                  <span>{String(index + 1).padStart(2, '0')}</span>
+                </div>
+                <div class="project-panel__body">
+                  <div class="project-panel__meta"><span>{project.data.role}</span><i></i><span>{project.data.status}</span></div>
+                  <h3>{project.data.title}</h3>
+                  <p>{project.data.summary}</p>
+                  <div class="tag-row">{project.data.tags.slice(0, 3).map((tag) => <span>{tag}</span>)}</div>
+                </div>
+                <ArrowRight class="project-panel__arrow" size={20} aria-hidden="true" />
+              </a>
+            ))}
+          </div>
+        </section>
+
+        <section class="slide slide--audit" data-slide="3" data-label="审计案例" aria-hidden="true">
+          <div class="audit-visual reveal">
+            <img src={asset(recommend?.data.image)} alt="DSH Recommend 插件目录与审计界面" loading="lazy" />
+            <div class="scanline" aria-hidden="true"></div>
+            <span class="visual-caption">CASE STUDY / DSH RECOMMEND</span>
+          </div>
+
+          <div class="audit-story">
+            <p class="kicker reveal">03 / MAKE RISK EXPLAINABLE</p>
+            <h2 class="reveal">误报不是噪声，<br />而是模型缺陷。</h2>
+            <p class="slide-copy reveal">第一次扫描把 12 个插件全部判成高危。沿着真实 finding 回查，把“出现过危险词”收窄成调用点附近的可解释证据。</p>
+
+            <div class="audit-metrics reveal">
+              <div><strong>952</strong><span>单条规则误报</span></div>
+              <ArrowRight size={18} aria-hidden="true" />
+              <div><strong>150</strong><span>字符关联窗口</span></div>
+              <ArrowRight size={18} aria-hidden="true" />
+              <div><strong>75</strong><span>规则 ID / impact</span></div>
+            </div>
+
+            <div class="evidence-flow reveal" aria-label="审计证据流程">
+              <span>SOURCE</span><i></i><span>CALL SITE</span><i></i><span>CONTEXT</span><i></i><span>FINDING</span>
+            </div>
+            <a class="text-button" href={`${mainSite}projects/dsh-recommend/`}>阅读完整案例 <ArrowRight size={18} aria-hidden="true" /></a>
+          </div>
+        </section>
+
+        <section class="slide slide--boundaries" data-slide="4" data-label="工程边界" aria-hidden="true">
+          <div class="slide-heading">
+            <p class="kicker reveal">04 / BOUNDARY-FIRST ENGINEERING</p>
+            <h2 class="reveal">先定义失败，<br />再设计成功。</h2>
+            <p class="slide-copy reveal">复杂系统真正的质量，藏在取消、隔离、重试、回滚和证据保留里。</p>
+          </div>
+
+          <div class="boundary-list">
+            <article class="boundary-row reveal">
+              <div class="boundary-icon"><Workflow size={23} aria-hidden="true" /></div>
+              <span class="boundary-number">01</span>
+              <div><h3>会话与消息</h3><p>即时取消绕开普通队列，持久 Outbox 让回复不因短时网络失败而丢失。</p></div>
+              <code>SESSION / OUTBOX</code>
+            </article>
+            <article class="boundary-row reveal">
+              <div class="boundary-icon"><ShieldCheck size={23} aria-hidden="true" /></div>
+              <span class="boundary-number">02</span>
+              <div><h3>权限与隔离</h3><p>用户、Profile、凭据与安装来源都有明确所有权，不把“能运行”写成“可托管”。</p></div>
+              <code>ACL / SANDBOX</code>
+            </article>
+            <article class="boundary-row reveal">
+              <div class="boundary-icon"><ScanSearch size={23} aria-hidden="true" /></div>
+              <span class="boundary-number">03</span>
+              <div><h3>测试与证据</h3><p>精确版本、真实冷启动、结构化报告和失败分类，共同回答“究竟验证了什么”。</p></div>
+              <code>SMOKE / TRACE</code>
+            </article>
+          </div>
+        </section>
+
+        <section class="slide slide--capabilities" data-slide="5" data-label="能力图谱" aria-hidden="true">
+          <div class="capability-copy">
+            <p class="kicker reveal">05 / CAPABILITY CONSTELLATION</p>
+            <h2 class="reveal">跨层工作，<br />保持证据连续。</h2>
+            <p class="slide-copy reveal">不是技术名词的集合，而是从界面、运行时到交付链路的连续实现能力。</p>
+          </div>
+
+          <div class="capability-orbit reveal" aria-label="技术能力分布">
+            <svg viewBox="0 0 620 620" role="img" aria-labelledby="cap-title">
+              <title id="cap-title">围绕产品工程的技术能力图谱</title>
+              <circle class="orbit orbit--outer" cx="310" cy="310" r="254"></circle>
+              <circle class="orbit orbit--mid" cx="310" cy="310" r="176"></circle>
+              <circle class="orbit orbit--inner" cx="310" cy="310" r="94"></circle>
+              <g class="orbit-core"><circle cx="310" cy="310" r="65"></circle><text x="310" y="304">PRODUCT</text><text x="310" y="326">SYSTEMS</text></g>
+              <g class="orbit-node" transform="translate(310 56)"><circle r="31"></circle><text y="5">AI</text></g>
+              <g class="orbit-node" transform="translate(530 183)"><circle r="31"></circle><text y="5">DESKTOP</text></g>
+              <g class="orbit-node" transform="translate(530 437)"><circle r="31"></circle><text y="5">SECURITY</text></g>
+              <g class="orbit-node" transform="translate(310 564)"><circle r="31"></circle><text y="5">TESTING</text></g>
+              <g class="orbit-node" transform="translate(90 437)"><circle r="31"></circle><text y="5">DEVOPS</text></g>
+              <g class="orbit-node" transform="translate(90 183)"><circle r="31"></circle><text y="5">WEB</text></g>
+              <path class="orbit-signal" d="M310 56A254 254 0 0 1 530 437A254 254 0 0 1 90 437A254 254 0 0 1 310 56"></path>
+            </svg>
+          </div>
+
+          <div class="capability-stack reveal">
+            <span>TypeScript</span><span>Electron</span><span>Three.js</span><span>Astro</span><span>Python</span><span>Docker</span><span>GitHub Actions</span><span>Computer Vision</span><span>Agent Skills</span>
+          </div>
+        </section>
+
+        <section class="slide slide--outro" data-slide="6" data-label="继续探索" aria-hidden="true">
+          <div class="outro-copy">
+            <p class="kicker reveal">06 / OPEN FOR THE NEXT HARD PROBLEM</p>
+            <h2 class="reveal">让系统运行，<br /><span>让判断留下。</span></h2>
+            <p class="lead reveal">继续浏览完整项目、可复用 Skills 与工程知识记录。</p>
+            <div class="outro-actions reveal">
+              <a class="text-button" href={`${mainSite}projects/`}>进入项目档案 <ArrowRight size={18} aria-hidden="true" /></a>
+              <a class="text-link" href={`${mainSite}skills/`}><Code2 size={17} aria-hidden="true" /> 查看 Skills</a>
+            </div>
+          </div>
+
+          <a class="outro-signature reveal" href={mainSite} aria-label="返回 zp-home 首页">
+            <span>zp-home</span>
+            <small>BUILD / PACKAGE / EXPLAIN</small>
+          </a>
+        </section>
+      </main>
+
+      <footer class="deck-footer">
+        <div class="slide-counter"><span id="current-slide">01</span><i></i><span>{String(slideLabels.length).padStart(2, '0')}</span></div>
+        <div class="progress-track" aria-hidden="true"><i id="progress-bar"></i></div>
+        <div class="deck-arrows">
+          <button class="icon-button" id="previous-slide" type="button" title="上一页" aria-label="上一页"><ArrowLeft size={18} aria-hidden="true" /></button>
+          <button class="icon-button" id="next-slide" type="button" title="下一页" aria-label="下一页"><ArrowRight size={18} aria-hidden="true" /></button>
+        </div>
+      </footer>
+    </div>
+
+    <script>
+      import * as THREE from 'three'
+
+      const stage = document.querySelector<HTMLElement>('.stage')
+      const slides = Array.from(document.querySelectorAll<HTMLElement>('.slide'))
+      const navItems = Array.from(document.querySelectorAll<HTMLButtonElement>('[data-slide-target]'))
+      const currentLabel = document.querySelector<HTMLElement>('#current-slide')
+      const progress = document.querySelector<HTMLElement>('#progress-bar')
+      const previousButton = document.querySelector<HTMLButtonElement>('#previous-slide')
+      const nextButton = document.querySelector<HTMLButtonElement>('#next-slide')
+      const motionButton = document.querySelector<HTMLButtonElement>('#motion-toggle')
+      const fullscreenButton = document.querySelector<HTMLButtonElement>('#fullscreen-toggle')
+      const canvas = document.querySelector<HTMLCanvasElement>('#world-canvas')
+      const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+      let current = 0
+      let wheelLock = false
+      let touchStartY = 0
+      let motionPaused = reduceMotion
+      let sceneController: ReturnType<typeof createScene> | null = null
+
+      slides.forEach((slide, index) => { slide.inert = index !== 0 })
+
+      function setSlide(index: number) {
+        const next = Math.max(0, Math.min(slides.length - 1, index))
+        if (next === current && slides[current]?.classList.contains('is-active')) return
+        const direction = next > current ? 1 : -1
+
+        const activeElement = document.activeElement
+        if (activeElement instanceof HTMLElement && slides[current]?.contains(activeElement)) activeElement.blur()
+
+        slides.forEach((slide, slideIndex) => {
+          slide.classList.toggle('is-active', slideIndex === next)
+          slide.classList.toggle('is-before', slideIndex < next)
+          slide.classList.toggle('is-after', slideIndex > next)
+          slide.inert = slideIndex !== next
+          slide.setAttribute('aria-hidden', String(slideIndex !== next))
+        })
+        navItems.forEach((item, itemIndex) => {
+          if (itemIndex === next) item.setAttribute('aria-current', 'step')
+          else item.removeAttribute('aria-current')
+        })
+
+        current = next
+        if (stage) stage.dataset.scene = String(current)
+        if (currentLabel) currentLabel.textContent = String(current + 1).padStart(2, '0')
+        if (progress) progress.style.transform = `scaleX(${(current + 1) / slides.length})`
+        if (previousButton) previousButton.disabled = current === 0
+        if (nextButton) nextButton.disabled = current === slides.length - 1
+        sceneController?.setScene(current, direction)
+        history.replaceState(null, '', `#${slides[current]?.dataset.label || current + 1}`)
+      }
+
+      navItems.forEach((item) => item.addEventListener('click', () => setSlide(Number(item.dataset.slideTarget))))
+      document.querySelectorAll<HTMLElement>('[data-next]').forEach((item) => item.addEventListener('click', () => setSlide(current + 1)))
+      previousButton?.addEventListener('click', () => setSlide(current - 1))
+      nextButton?.addEventListener('click', () => setSlide(current + 1))
+
+      window.addEventListener('keydown', (event) => {
+        if (['ArrowRight', 'ArrowDown', 'PageDown', ' '].includes(event.key)) {
+          event.preventDefault()
+          setSlide(current + 1)
+        }
+        if (['ArrowLeft', 'ArrowUp', 'PageUp'].includes(event.key)) {
+          event.preventDefault()
+          setSlide(current - 1)
+        }
+        if (event.key === 'Home') setSlide(0)
+        if (event.key === 'End') setSlide(slides.length - 1)
+      })
+
+      window.addEventListener('wheel', (event) => {
+        if (Math.abs(event.deltaY) < 24 || wheelLock) return
+        event.preventDefault()
+        wheelLock = true
+        setSlide(current + (event.deltaY > 0 ? 1 : -1))
+        window.setTimeout(() => { wheelLock = false }, 720)
+      }, { passive: false })
+
+      window.addEventListener('touchstart', (event) => { touchStartY = event.touches[0]?.clientY || 0 }, { passive: true })
+      window.addEventListener('touchend', (event) => {
+        const delta = touchStartY - (event.changedTouches[0]?.clientY || touchStartY)
+        if (Math.abs(delta) > 48) setSlide(current + (delta > 0 ? 1 : -1))
+      }, { passive: true })
+
+      motionButton?.addEventListener('click', () => {
+        motionPaused = !motionPaused
+        motionButton.classList.toggle('is-paused', motionPaused)
+        motionButton.title = motionPaused ? '播放动画' : '暂停动画'
+        motionButton.setAttribute('aria-label', motionButton.title)
+        sceneController?.setPaused(motionPaused)
+      })
+
+      fullscreenButton?.addEventListener('click', async () => {
+        if (!document.fullscreenElement) await document.documentElement.requestFullscreen?.()
+        else await document.exitFullscreen?.()
+      })
+
+      document.addEventListener('fullscreenchange', () => {
+        if (!fullscreenButton) return
+        fullscreenButton.title = document.fullscreenElement ? '退出全屏' : '进入全屏'
+        fullscreenButton.setAttribute('aria-label', fullscreenButton.title)
+      })
+
+      function createScene(targetCanvas: HTMLCanvasElement) {
+        const renderer = new THREE.WebGLRenderer({ canvas: targetCanvas, alpha: true, antialias: true, powerPreference: 'high-performance' })
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.8))
+        renderer.setClearColor(0x090b0a, 0)
+
+        const scene = new THREE.Scene()
+        const camera = new THREE.PerspectiveCamera(42, 1, 0.1, 100)
+        camera.position.set(0, 0, 13)
+        const world = new THREE.Group()
+        scene.add(world)
+
+        const green = new THREE.Color('#c8ff3d')
+        const cyan = new THREE.Color('#65d9dc')
+        const coral = new THREE.Color('#ff6b4a')
+        const white = new THREE.Color('#dfe7dc')
+
+        const coreMaterial = new THREE.MeshBasicMaterial({ color: green, wireframe: true, transparent: true, opacity: 0.68 })
+        const core = new THREE.Mesh(new THREE.IcosahedronGeometry(2.25, 2), coreMaterial)
+        world.add(core)
+
+        const knotMaterial = new THREE.MeshBasicMaterial({ color: coral, wireframe: true, transparent: true, opacity: 0.38 })
+        const knot = new THREE.Mesh(new THREE.TorusKnotGeometry(3.25, 0.1, 160, 12, 2, 5), knotMaterial)
+        knot.rotation.x = Math.PI * 0.34
+        world.add(knot)
+
+        const ringMaterial = new THREE.MeshBasicMaterial({ color: cyan, transparent: true, opacity: 0.55, side: THREE.DoubleSide })
+        const ring = new THREE.Mesh(new THREE.TorusGeometry(4.25, 0.018, 6, 180), ringMaterial)
+        ring.rotation.x = Math.PI * 0.58
+        ring.rotation.z = Math.PI * 0.08
+        world.add(ring)
+
+        const pointPositions = new Float32Array(560 * 3)
+        for (let index = 0; index < 560; index += 1) {
+          const radius = 4.8 + Math.random() * 7.2
+          const theta = Math.random() * Math.PI * 2
+          const phi = Math.acos(2 * Math.random() - 1)
+          pointPositions[index * 3] = radius * Math.sin(phi) * Math.cos(theta)
+          pointPositions[index * 3 + 1] = radius * Math.sin(phi) * Math.sin(theta)
+          pointPositions[index * 3 + 2] = radius * Math.cos(phi)
+        }
+        const pointGeometry = new THREE.BufferGeometry()
+        pointGeometry.setAttribute('position', new THREE.BufferAttribute(pointPositions, 3))
+        const pointMaterial = new THREE.PointsMaterial({ color: white, size: 0.025, transparent: true, opacity: 0.46, sizeAttenuation: true })
+        const points = new THREE.Points(pointGeometry, pointMaterial)
+        world.add(points)
+
+        const linePositions: number[] = []
+        for (let index = 0; index < 22; index += 1) {
+          const angle = (index / 22) * Math.PI * 2
+          linePositions.push(0, 0, 0, Math.cos(angle) * 5.4, Math.sin(angle) * 5.4, Math.sin(angle * 3) * 1.7)
+        }
+        const lineGeometry = new THREE.BufferGeometry()
+        lineGeometry.setAttribute('position', new THREE.Float32BufferAttribute(linePositions, 3))
+        const rays = new THREE.LineSegments(lineGeometry, new THREE.LineBasicMaterial({ color: green, transparent: true, opacity: 0.12 }))
+        world.add(rays)
+
+        const sceneTargets = [
+          { x: 3.8, y: 0.0, z: 0, scale: 1.0, rx: 0.1, ry: 0.3, color: green },
+          { x: 5.6, y: -2.0, z: -2, scale: 0.72, rx: 0.8, ry: 1.4, color: cyan },
+          { x: 0.0, y: 4.7, z: -3, scale: 0.6, rx: 1.8, ry: 0.2, color: green },
+          { x: -5.5, y: -2.6, z: -2, scale: 0.72, rx: 0.3, ry: 2.4, color: coral },
+          { x: 4.7, y: 1.2, z: -1, scale: 0.82, rx: 1.2, ry: 3.0, color: cyan },
+          { x: 0.0, y: 0.2, z: 0, scale: 1.15, rx: 0.2, ry: 1.0, color: green },
+          { x: 3.8, y: -0.1, z: 0, scale: 1.0, rx: 1.1, ry: 2.0, color: green },
+        ]
+        let target = sceneTargets[0]
+        let paused = motionPaused
+        let pointerX = 0
+        let pointerY = 0
+        let previousFrame = performance.now()
+
+        function resize() {
+          const width = window.innerWidth
+          const height = window.innerHeight
+          renderer.setSize(width, height, false)
+          camera.aspect = width / height
+          camera.updateProjectionMatrix()
+        }
+
+        function onPointerMove(event: PointerEvent) {
+          pointerX = (event.clientX / window.innerWidth - 0.5) * 0.5
+          pointerY = (event.clientY / window.innerHeight - 0.5) * 0.35
+        }
+
+        function render() {
+          const now = performance.now()
+          const delta = Math.min((now - previousFrame) / 1000, 0.05)
+          previousFrame = now
+          const ease = 1 - Math.pow(0.001, delta)
+          world.position.x = THREE.MathUtils.lerp(world.position.x, target.x, ease)
+          world.position.y = THREE.MathUtils.lerp(world.position.y, target.y, ease)
+          world.position.z = THREE.MathUtils.lerp(world.position.z, target.z, ease)
+          world.scale.lerp(new THREE.Vector3(target.scale, target.scale, target.scale), ease)
+          world.rotation.x = THREE.MathUtils.lerp(world.rotation.x, target.rx - pointerY, ease * 0.7)
+          world.rotation.y = THREE.MathUtils.lerp(world.rotation.y, target.ry + pointerX, ease * 0.7)
+          coreMaterial.color.lerp(target.color, ease * 0.8)
+
+          if (!paused) {
+            core.rotation.y += delta * 0.15
+            core.rotation.x += delta * 0.05
+            knot.rotation.z -= delta * 0.07
+            ring.rotation.z += delta * 0.035
+            points.rotation.y -= delta * 0.008
+          }
+          renderer.render(scene, camera)
+          requestAnimationFrame(render)
+        }
+
+        window.addEventListener('resize', resize)
+        window.addEventListener('pointermove', onPointerMove, { passive: true })
+        resize()
+        render()
+
+        return {
+          setScene(index: number, direction: number) {
+            target = sceneTargets[index] || sceneTargets[0]
+            world.position.z += direction * 0.45
+          },
+          setPaused(value: boolean) { paused = value },
+        }
+      }
+
+      try {
+        if (canvas) sceneController = createScene(canvas)
+      } catch {
+        document.body.classList.add('no-webgl')
+        document.querySelector('.system-status')?.replaceChildren('STATIC MODE')
+      }
+
+      if (motionButton && motionPaused) motionButton.classList.add('is-paused')
+      const initialHash = decodeURIComponent(location.hash.slice(1))
+      const initialIndex = slides.findIndex((slide) => slide.dataset.label === initialHash)
+      if (initialIndex > -1) setSlide(initialIndex)
+      else {
+        if (progress) progress.style.transform = `scaleX(${1 / slides.length})`
+        if (previousButton) previousButton.disabled = true
+      }
+    </script>
+  </body>
+</html>
+
+<style is:global>
+  :root {
+    color-scheme: dark;
+    --deck-bg: #090b0a;
+    --deck-ink: #edf2ea;
+    --deck-muted: #939b91;
+    --deck-line: rgb(237 242 234 / 18%);
+    --deck-soft-line: rgb(237 242 234 / 9%);
+    --deck-green: #c8ff3d;
+    --deck-cyan: #65d9dc;
+    --deck-coral: #ff6b4a;
+    --deck-header: 86px;
+    --deck-footer: 70px;
+    --deck-side: 92px;
+  }
+
+  * { box-sizing: border-box; }
+
+  html,
+  body {
+    width: 100%;
+    min-width: 0;
+    height: 100%;
+    margin: 0;
+    overflow: hidden;
+    background: var(--deck-bg);
+    color: var(--deck-ink);
+    font-family: 'DM Sans Variable', 'Microsoft YaHei', sans-serif;
+    letter-spacing: 0;
+  }
+
+  button,
+  a { -webkit-tap-highlight-color: transparent; }
+
+  button { color: inherit; font: inherit; letter-spacing: 0; }
+  a { color: inherit; text-decoration: none; }
+
+  :where(a, button):focus-visible {
+    outline: 2px solid var(--deck-cyan);
+    outline-offset: 4px;
+  }
+
+  .skip-link {
+    position: fixed;
+    z-index: 100;
+    top: 10px;
+    left: 10px;
+    padding: 8px 12px;
+    background: var(--deck-green);
+    color: #11150a;
+    transform: translateY(-160%);
+  }
+
+  .skip-link:focus { transform: translateY(0); }
+
+  .stage {
+    position: relative;
+    width: 100%;
+    height: 100dvh;
+    isolation: isolate;
+    overflow: hidden;
+    background-color: var(--deck-bg);
+    background-image:
+      linear-gradient(var(--deck-soft-line) 1px, transparent 1px),
+      linear-gradient(90deg, var(--deck-soft-line) 1px, transparent 1px);
+    background-size: 80px 80px;
+  }
+
+  .stage::after {
+    position: absolute;
+    z-index: -1;
+    inset: 0;
+    background: linear-gradient(90deg, rgb(9 11 10 / 98%) 0%, rgb(9 11 10 / 82%) 40%, rgb(9 11 10 / 18%) 72%, transparent 100%);
+    content: '';
+    pointer-events: none;
+    transition: opacity 600ms ease;
+  }
+
+  .stage[data-scene='1']::after,
+  .stage[data-scene='2']::after,
+  .stage[data-scene='3']::after,
+  .stage[data-scene='4']::after { opacity: 0.82; }
+
+  .stage[data-scene='5']::after { opacity: 0.18; }
+
+  #world-canvas {
+    position: absolute;
+    z-index: -3;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+  }
+
+  .stage__grain {
+    position: absolute;
+    z-index: 8;
+    inset: 0;
+    opacity: 0.11;
+    pointer-events: none;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 180 180' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.78' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.35'/%3E%3C/svg%3E");
+    mix-blend-mode: soft-light;
+  }
+
+  .deck-header,
+  .deck-footer {
+    position: absolute;
+    z-index: 20;
+    right: 0;
+    left: 0;
+    display: flex;
+    align-items: center;
+    padding-inline: 34px;
+  }
+
+  .deck-header {
+    top: 0;
+    height: var(--deck-header);
+    justify-content: space-between;
+    border-bottom: 1px solid var(--deck-line);
+  }
+
+  .brand { display: inline-flex; align-items: center; gap: 14px; }
+
+  .brand__mark {
+    display: grid;
+    width: 42px;
+    height: 42px;
+    place-items: center;
+    background: var(--deck-green);
+    color: #11150a;
+    font-family: 'JetBrains Mono Variable', monospace;
+    font-size: 16px;
+    font-weight: 800;
+  }
+
+  .brand__meta {
+    color: #b5bcb2;
+    font-family: 'JetBrains Mono Variable', monospace;
+    font-size: 10px;
+    font-weight: 600;
+    line-height: 1.5;
+  }
+
+  .deck-tools { display: flex; align-items: center; gap: 8px; }
+
+  .system-status {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    margin-right: 14px;
+    color: #aeb5ab;
+    font-family: 'JetBrains Mono Variable', monospace;
+    font-size: 10px;
+  }
+
+  .system-status i {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: var(--deck-green);
+    box-shadow: 0 0 14px var(--deck-green);
+    animation: status-pulse 2s ease-in-out infinite;
+  }
+
+  .icon-button {
+    display: inline-grid;
+    width: 38px;
+    height: 38px;
+    flex: 0 0 38px;
+    padding: 0;
+    place-items: center;
+    border: 1px solid var(--deck-line);
+    border-radius: 0;
+    background: rgb(9 11 10 / 34%);
+    cursor: pointer;
+    transition: border-color 160ms ease, background-color 160ms ease, color 160ms ease;
+  }
+
+  .icon-button:hover { border-color: var(--deck-green); background: var(--deck-green); color: #11150a; }
+  .icon-button:disabled { cursor: default; opacity: 0.28; }
+  .icon-button:disabled:hover { border-color: var(--deck-line); background: transparent; color: inherit; }
+  .play-icon { display: none; }
+  .is-paused .pause-icon { display: none; }
+  .is-paused .play-icon { display: block; }
+
+  .deck-nav {
+    position: absolute;
+    z-index: 20;
+    top: var(--deck-header);
+    bottom: var(--deck-footer);
+    left: 0;
+    display: flex;
+    width: var(--deck-side);
+    flex-direction: column;
+    justify-content: center;
+    gap: 4px;
+    border-right: 1px solid var(--deck-line);
+  }
+
+  .deck-nav__item {
+    position: relative;
+    display: grid;
+    width: 100%;
+    height: 50px;
+    padding: 0 20px;
+    grid-template-columns: 25px 1fr;
+    align-items: center;
+    gap: 8px;
+    border: 0;
+    background: transparent;
+    color: #6f766d;
+    cursor: pointer;
+    font-family: 'JetBrains Mono Variable', monospace;
+    font-size: 10px;
+    text-align: left;
+    transition: color 180ms ease;
+  }
+
+  .deck-nav__item i { height: 1px; background: currentColor; transform-origin: left; transition: transform 300ms ease, background-color 180ms ease; }
+
+  .deck-nav__item em {
+    position: absolute;
+    left: 82px;
+    width: max-content;
+    padding: 5px 8px;
+    background: var(--deck-green);
+    color: #11150a;
+    font-style: normal;
+    opacity: 0;
+    pointer-events: none;
+    transform: translateX(-6px);
+    transition: opacity 160ms ease, transform 160ms ease;
+  }
+
+  .deck-nav__item:hover em,
+  .deck-nav__item:focus-visible em { opacity: 1; transform: translateX(0); }
+  .deck-nav__item[aria-current='step'] { color: var(--deck-green); }
+  .deck-nav__item[aria-current='step'] i { transform: scaleX(1.4); }
+
+  .deck {
+    position: absolute;
+    z-index: 2;
+    inset: var(--deck-header) 0 var(--deck-footer) var(--deck-side);
+    overflow: hidden;
+  }
+
+  .slide {
+    position: absolute;
+    inset: 0;
+    display: grid;
+    visibility: hidden;
+    padding: 44px 54px;
+    opacity: 0;
+    pointer-events: none;
+    transform: translateY(42px);
+    transition: opacity 480ms ease, transform 650ms cubic-bezier(0.16, 1, 0.3, 1), visibility 0s 650ms;
+  }
+
+  .slide.is-before { transform: translateY(-42px); }
+  .slide.is-active { visibility: visible; opacity: 1; pointer-events: auto; transform: translateY(0); transition-delay: 0s; }
+
+  .reveal { transition: opacity 450ms ease, transform 650ms cubic-bezier(0.16, 1, 0.3, 1); }
+  .slide:not(.is-active) .reveal { opacity: 0; transform: translateY(24px); }
+  .slide.is-active .reveal { opacity: 1; transform: translateY(0); }
+  .slide.is-active .reveal:nth-child(2) { transition-delay: 70ms; }
+  .slide.is-active .reveal:nth-child(3) { transition-delay: 140ms; }
+  .slide.is-active .reveal:nth-child(4) { transition-delay: 210ms; }
+
+  .kicker {
+    margin: 0 0 18px;
+    color: var(--deck-green);
+    font-family: 'JetBrains Mono Variable', monospace;
+    font-size: 11px;
+    font-weight: 700;
+  }
+
+  .slide h1,
+  .slide h2,
+  .slide h3,
+  .slide p { letter-spacing: 0; }
+
+  .slide h1,
+  .slide h2 { margin: 0; font-weight: 710; line-height: 1.02; }
+  .slide h1 { max-width: 800px; font-size: 72px; }
+  .slide h2 { font-size: 52px; }
+  .slide h1 span,
+  .slide--outro h2 span { color: var(--deck-green); }
+
+  .lead,
+  .slide-copy { color: #adb5aa; line-height: 1.7; }
+  .lead { max-width: 660px; margin: 26px 0 0; font-size: 18px; }
+  .slide-copy { max-width: 510px; margin: 24px 0 0; font-size: 15px; }
+
+  .text-button,
+  .text-link {
+    display: inline-flex;
+    min-height: 44px;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    border: 0;
+    border-radius: 0;
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: 700;
+  }
+
+  .text-button { padding: 0 18px; background: var(--deck-green); color: #11150a; }
+  .text-button:hover { background: #ddff82; }
+  .text-link { padding: 0 4px; border-bottom: 1px solid var(--deck-line); background: transparent; color: #d4dbd1; }
+  .text-link:hover { border-color: var(--deck-cyan); color: var(--deck-cyan); }
+
+  .slide--cover { grid-template-columns: minmax(0, 1fr) 330px; align-items: center; }
+  .cover-copy { align-self: center; }
+  .cover-actions,
+  .outro-actions { display: flex; align-items: center; gap: 24px; margin-top: 32px; }
+
+  .cover-index {
+    display: grid;
+    align-self: end;
+    margin-bottom: 4px;
+    border-top: 1px solid var(--deck-line);
+  }
+
+  .cover-index div { display: grid; min-height: 62px; grid-template-columns: 54px 1fr; align-items: center; border-bottom: 1px solid var(--deck-line); }
+  .cover-index strong { font-family: 'JetBrains Mono Variable', monospace; font-size: 21px; }
+  .cover-index span { color: var(--deck-muted); font-family: 'JetBrains Mono Variable', monospace; font-size: 10px; }
+
+  .slide--system { grid-template-columns: minmax(320px, 0.75fr) minmax(520px, 1.25fr); align-items: center; gap: 44px; }
+
+  .system-map { width: min(100%, 760px); justify-self: end; }
+  .system-map svg { display: block; width: 100%; overflow: visible; color: var(--deck-green); }
+  .map-grid { fill: none; stroke: rgb(237 242 234 / 7%); stroke-width: 1; }
+  .map-flow,
+  .map-return { fill: none; stroke: currentColor; stroke-width: 1.8; stroke-dasharray: 9 8; animation: flow-line 14s linear infinite; }
+  .map-return { color: var(--deck-cyan); opacity: 0.56; stroke-width: 1.2; }
+  .map-node circle { fill: #0f1310; stroke: rgb(237 242 234 / 42%); stroke-width: 1.2; }
+  .map-node text { fill: var(--deck-green); font-family: 'JetBrains Mono Variable', monospace; font-size: 11px; text-anchor: middle; }
+  .map-node .map-label { fill: #edf2ea; font-size: 16px; font-weight: 700; }
+  .map-node .map-pulse { fill: none; stroke: var(--deck-green); opacity: 0; animation: node-pulse 3.6s ease-out infinite; }
+  .map-node--two .map-pulse { animation-delay: 0.5s; }
+  .map-node--three .map-pulse { animation-delay: 1s; }
+  .map-node--four .map-pulse { animation-delay: 1.5s; }
+  .map-node--five .map-pulse { animation-delay: 2s; }
+  .map-note { fill: var(--deck-muted); font-family: 'JetBrains Mono Variable', monospace; font-size: 9px; }
+
+  .map-legend { display: flex; justify-content: flex-end; gap: 22px; color: var(--deck-muted); font-family: 'JetBrains Mono Variable', monospace; font-size: 9px; }
+  .map-legend span { display: inline-flex; align-items: center; gap: 7px; }
+  .map-legend i { width: 7px; height: 7px; border-radius: 50%; }
+  .legend-green { background: var(--deck-green); }
+  .legend-cyan { background: var(--deck-cyan); }
+  .legend-red { background: var(--deck-coral); }
+
+  .slide--projects { display: block; padding-top: 34px; }
+  .slide-heading--row { display: flex; align-items: end; justify-content: space-between; gap: 40px; }
+  .slide-heading--row .slide-copy { margin-bottom: 4px; }
+
+  .project-gallery { display: grid; height: calc(100% - 170px); min-height: 330px; margin-top: 28px; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1px; background: var(--deck-line); }
+  .project-panel { position: relative; display: grid; min-width: 0; grid-template-rows: minmax(132px, 44%) 1fr; overflow: hidden; background: #0c0f0d; transition: background-color 220ms ease; }
+  .project-panel:hover { background: #141914; }
+  .project-panel__media { position: relative; min-height: 0; overflow: hidden; border-bottom: 1px solid var(--deck-line); }
+  .project-panel__media::after { position: absolute; inset: 0; background: linear-gradient(180deg, transparent 52%, rgb(9 11 10 / 68%)); content: ''; }
+  .project-panel__media img { width: 100%; height: 100%; object-fit: cover; filter: saturate(0.82) contrast(1.04); transition: filter 300ms ease, transform 500ms cubic-bezier(0.16, 1, 0.3, 1); }
+  .project-panel:hover img { filter: saturate(1.05) contrast(1.02); transform: scale(1.025); }
+  .project-panel__media > span { position: absolute; z-index: 2; top: 15px; left: 16px; color: #fff; font-family: 'JetBrains Mono Variable', monospace; font-size: 10px; }
+  .project-panel__body { min-height: 0; padding: 18px 20px 20px; }
+  .project-panel__meta { display: flex; align-items: center; gap: 8px; color: var(--deck-cyan); font-family: 'JetBrains Mono Variable', monospace; font-size: 9px; }
+  .project-panel__meta i { width: 3px; height: 3px; border-radius: 50%; background: currentColor; }
+  .project-panel h3 { margin: 12px 36px 8px 0; font-size: 22px; line-height: 1.16; }
+  .project-panel p { display: -webkit-box; margin: 0; overflow: hidden; color: #929a90; font-size: 12px; line-height: 1.55; -webkit-box-orient: vertical; -webkit-line-clamp: 2; }
+  .tag-row { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 13px; }
+  .tag-row span { padding: 3px 6px; border: 1px solid var(--deck-soft-line); color: #bbc2b8; font-family: 'JetBrains Mono Variable', monospace; font-size: 8px; }
+  .project-panel__arrow { position: absolute; right: 18px; bottom: 20px; color: var(--deck-green); transition: transform 180ms ease; }
+  .project-panel:hover .project-panel__arrow { transform: translateX(4px); }
+
+  .slide--audit { grid-template-columns: minmax(450px, 1.08fr) minmax(420px, 0.92fr); align-items: center; gap: 52px; }
+  .audit-visual { position: relative; height: min(61vh, 560px); min-height: 360px; overflow: hidden; border: 1px solid var(--deck-line); background: #111512; }
+  .audit-visual img { width: 100%; height: 100%; object-fit: cover; object-position: center; filter: saturate(0.84) contrast(1.06); }
+  .audit-visual::after { position: absolute; inset: 0; border: 1px solid rgb(200 255 61 / 18%); content: ''; pointer-events: none; }
+  .scanline { position: absolute; top: -12%; right: 0; left: 0; height: 12%; background: linear-gradient(180deg, transparent, rgb(200 255 61 / 22%), transparent); animation: scan 5.2s linear infinite; }
+  .visual-caption { position: absolute; right: 14px; bottom: 14px; padding: 6px 8px; background: rgb(9 11 10 / 82%); color: var(--deck-green); font-family: 'JetBrains Mono Variable', monospace; font-size: 9px; }
+  .audit-metrics { display: grid; margin: 26px 0; grid-template-columns: 1fr 24px 1fr 24px 1fr; align-items: center; gap: 8px; }
+  .audit-metrics div { min-width: 0; padding-top: 12px; border-top: 1px solid var(--deck-line); }
+  .audit-metrics strong { display: block; color: var(--deck-green); font-family: 'JetBrains Mono Variable', monospace; font-size: 25px; }
+  .audit-metrics span { display: block; color: var(--deck-muted); font-size: 10px; }
+  .audit-metrics > svg { color: #5f665d; }
+  .evidence-flow { display: grid; margin-bottom: 24px; grid-template-columns: auto 1fr auto 1fr auto 1fr auto; align-items: center; gap: 7px; color: #c5ccc2; font-family: 'JetBrains Mono Variable', monospace; font-size: 8px; }
+  .evidence-flow i { height: 1px; overflow: hidden; background: linear-gradient(90deg, var(--deck-cyan) 0 50%, transparent 50% 100%); background-size: 8px 1px; animation: evidence 1s linear infinite; }
+
+  .slide--boundaries { grid-template-columns: minmax(330px, 0.7fr) minmax(620px, 1.3fr); align-items: center; gap: 64px; }
+  .boundary-list { border-top: 1px solid var(--deck-line); }
+  .boundary-row { display: grid; min-height: 132px; grid-template-columns: 44px 30px minmax(0, 1fr) auto; align-items: center; gap: 18px; border-bottom: 1px solid var(--deck-line); }
+  .boundary-icon { display: grid; width: 42px; height: 42px; place-items: center; border: 1px solid var(--deck-line); color: var(--deck-green); }
+  .boundary-number { color: #666e64; font-family: 'JetBrains Mono Variable', monospace; font-size: 10px; }
+  .boundary-row h3 { margin: 0 0 6px; font-size: 18px; }
+  .boundary-row p { max-width: 470px; margin: 0; color: var(--deck-muted); font-size: 12px; line-height: 1.55; }
+  .boundary-row code { color: var(--deck-cyan); font-family: 'JetBrains Mono Variable', monospace; font-size: 9px; }
+
+  .slide--capabilities { grid-template-columns: 0.75fr 1fr 0.58fr; align-items: center; gap: 24px; }
+  .capability-copy { position: relative; z-index: 2; }
+  .capability-orbit { width: min(56vh, 540px); max-width: 100%; justify-self: center; }
+  .capability-orbit svg { display: block; width: 100%; overflow: visible; }
+  .orbit { fill: none; stroke: rgb(237 242 234 / 22%); stroke-width: 1; stroke-dasharray: 3 8; transform-origin: center; animation: orbit-rotate 34s linear infinite; }
+  .orbit--mid { animation-direction: reverse; animation-duration: 27s; }
+  .orbit--inner { stroke: var(--deck-cyan); opacity: 0.5; animation-duration: 18s; }
+  .orbit-core circle { fill: #10140e; stroke: var(--deck-green); stroke-width: 1.5; }
+  .orbit-core text { fill: var(--deck-ink); font-family: 'JetBrains Mono Variable', monospace; font-size: 11px; text-anchor: middle; }
+  .orbit-node circle { fill: #090b0a; stroke: #737b71; stroke-width: 1; }
+  .orbit-node text { fill: #d9dfd6; font-family: 'JetBrains Mono Variable', monospace; font-size: 8px; text-anchor: middle; }
+  .orbit-signal { fill: none; stroke: var(--deck-green); stroke-width: 1.5; stroke-dasharray: 2 15; animation: flow-line 10s linear infinite; }
+  .capability-stack { display: grid; align-self: center; border-top: 1px solid var(--deck-line); }
+  .capability-stack span { padding: 8px 2px; border-bottom: 1px solid var(--deck-line); color: #b3bbb0; font-family: 'JetBrains Mono Variable', monospace; font-size: 10px; }
+  .capability-stack span:nth-child(3n + 1) { color: var(--deck-green); }
+  .capability-stack span:nth-child(3n + 2) { color: var(--deck-cyan); }
+
+  .slide--outro { grid-template-columns: minmax(0, 1fr) 340px; align-items: center; }
+  .slide--outro h2 { max-width: 840px; font-size: 68px; }
+  .outro-signature { display: grid; align-self: end; margin-bottom: 6px; gap: 8px; text-align: right; }
+  .outro-signature span { color: var(--deck-green); font-size: 38px; font-weight: 760; }
+  .outro-signature small { color: var(--deck-muted); font-family: 'JetBrains Mono Variable', monospace; font-size: 9px; }
+
+  .deck-footer {
+    bottom: 0;
+    height: var(--deck-footer);
+    justify-content: space-between;
+    border-top: 1px solid var(--deck-line);
+  }
+
+  .slide-counter { display: flex; width: 82px; align-items: center; gap: 8px; font-family: 'JetBrains Mono Variable', monospace; font-size: 10px; }
+  .slide-counter i { width: 18px; height: 1px; background: #515750; }
+  .slide-counter span:first-child { color: var(--deck-green); }
+  .progress-track { position: absolute; right: 118px; left: 118px; height: 1px; overflow: hidden; background: var(--deck-line); }
+  .progress-track i { display: block; width: 100%; height: 100%; background: var(--deck-green); transform: scaleX(0.1428); transform-origin: left; transition: transform 450ms cubic-bezier(0.16, 1, 0.3, 1); }
+  .deck-arrows { display: flex; gap: 8px; }
+
+  @keyframes status-pulse { 50% { opacity: 0.45; box-shadow: 0 0 4px var(--deck-green); } }
+  @keyframes flow-line { to { stroke-dashoffset: -140; } }
+  @keyframes node-pulse { 0% { opacity: 0.7; transform: scale(0.7); } 80%, 100% { opacity: 0; transform: scale(1.45); } }
+  @keyframes scan { to { transform: translateY(930%); } }
+  @keyframes evidence { to { background-position: 8px 0; } }
+  @keyframes orbit-rotate { to { transform: rotate(360deg); } }
+
+  @media (max-width: 1100px) {
+    :root { --deck-side: 74px; }
+    .slide { padding-inline: 38px; }
+    .slide h1 { font-size: 60px; }
+    .slide h2 { font-size: 44px; }
+    .slide--system { grid-template-columns: 0.8fr 1.2fr; gap: 20px; }
+    .slide--audit { grid-template-columns: 0.95fr 1.05fr; gap: 34px; }
+    .slide--boundaries { grid-template-columns: 0.7fr 1.3fr; gap: 36px; }
+    .boundary-row { grid-template-columns: 42px 24px 1fr; }
+    .boundary-row code { display: none; }
+    .slide--capabilities { grid-template-columns: 0.75fr 1fr; }
+    .capability-stack { display: none; }
+    .deck-nav__item { padding-inline: 14px; }
+  }
+
+  @media (max-width: 760px) {
+    :root { --deck-header: 66px; --deck-footer: 58px; --deck-side: 0px; }
+    .stage { background-size: 52px 52px; }
+    .stage::after { background: linear-gradient(180deg, rgb(9 11 10 / 80%), rgb(9 11 10 / 92%)); }
+    .deck-header { padding-inline: 16px; }
+    .brand__mark { width: 36px; height: 36px; }
+    .brand__meta,
+    .system-status,
+    #fullscreen-toggle { display: none; }
+    .deck-nav { top: auto; right: 100px; bottom: 0; left: 100px; width: auto; height: var(--deck-footer); flex-direction: row; align-items: center; gap: 5px; border: 0; }
+    .deck-nav__item { display: block; width: 18px; height: 28px; padding: 0; font-size: 0; }
+    .deck-nav__item i { display: block; width: 100%; }
+    .deck-nav__item em { display: none; }
+    .deck-nav__item[aria-current='step'] i { transform: scaleY(3); }
+    .deck { left: 0; }
+    .slide { padding: 28px 20px; }
+    .slide h1 { font-size: 42px; }
+    .slide h2,
+    .slide--outro h2 { font-size: 36px; }
+    .lead { font-size: 15px; }
+    .slide-copy { margin-top: 16px; font-size: 13px; }
+    .kicker { margin-bottom: 12px; font-size: 9px; }
+    .deck-footer { padding-inline: 16px; }
+    .progress-track { display: none; }
+    .slide--cover { grid-template-columns: 1fr; align-content: center; }
+    .cover-index { display: grid; margin-top: 36px; align-self: auto; grid-template-columns: repeat(3, 1fr); }
+    .cover-index div { min-height: 54px; grid-template-columns: 1fr; align-content: center; gap: 2px; border-bottom: 0; border-right: 1px solid var(--deck-line); }
+    .cover-index div:last-child { border-right: 0; padding-left: 10px; }
+    .cover-actions { gap: 18px; margin-top: 24px; }
+    .slide--system { grid-template-columns: 1fr; align-content: center; gap: 24px; }
+    .system-map { max-height: 42vh; }
+    .system-map svg { max-height: 38vh; }
+    .map-legend { justify-content: flex-start; gap: 14px; }
+    .slide--projects { padding-top: 22px; overflow-y: auto; }
+    .slide-heading--row { display: block; }
+    .slide-heading--row .slide-copy { display: none; }
+    .project-gallery { height: auto; min-height: 0; margin-top: 20px; grid-template-columns: 1fr; gap: 1px; }
+    .project-panel { min-height: 146px; grid-template-columns: 124px 1fr; grid-template-rows: 1fr; }
+    .project-panel__media { min-height: 146px; border-right: 1px solid var(--deck-line); border-bottom: 0; }
+    .project-panel__body { padding: 14px; }
+    .project-panel h3 { margin-top: 8px; font-size: 17px; }
+    .project-panel p { font-size: 10px; }
+    .tag-row { display: none; }
+    .project-panel__arrow { right: 12px; bottom: 12px; }
+    .slide--audit { display: flex; flex-direction: column; justify-content: center; gap: 22px; overflow-y: auto; }
+    .audit-visual { width: 100%; height: 28vh; min-height: 170px; flex: 0 0 auto; }
+    .audit-metrics { margin-block: 18px; }
+    .audit-metrics strong { font-size: 20px; }
+    .evidence-flow { display: none; }
+    .slide--boundaries { display: block; overflow-y: auto; padding-top: 30px; }
+    .boundary-list { margin-top: 24px; }
+    .boundary-row { min-height: 105px; grid-template-columns: 34px 1fr; gap: 12px; }
+    .boundary-icon { width: 34px; height: 34px; }
+    .boundary-number { display: none; }
+    .boundary-row h3 { font-size: 16px; }
+    .boundary-row p { font-size: 10px; }
+    .slide--capabilities { grid-template-columns: 1fr; align-content: center; gap: 14px; }
+    .capability-copy { text-align: center; }
+    .capability-copy .slide-copy { max-width: 520px; margin-inline: auto; }
+    .capability-orbit { width: min(44vh, 390px); }
+    .slide--outro { grid-template-columns: 1fr; align-content: center; }
+    .outro-signature { align-self: auto; margin-top: 50px; text-align: left; }
+    .outro-signature span { font-size: 28px; }
+  }
+
+  @media (max-width: 430px) {
+    .slide { padding-inline: 16px; }
+    .slide h1 { font-size: 38px; }
+    .slide h2,
+    .slide--outro h2 { font-size: 32px; }
+    .lead { margin-top: 20px; }
+    .text-button,
+    .text-link { font-size: 11px; }
+    .audit-metrics { gap: 5px; }
+    .audit-metrics > svg { width: 13px; }
+    .audit-metrics span { font-size: 8px; }
+  }
+
+  @media (max-height: 700px) and (min-width: 761px) {
+    .slide { padding-block: 26px; }
+    .slide h1 { font-size: 58px; }
+    .slide h2 { font-size: 42px; }
+    .lead { margin-top: 18px; }
+    .project-gallery { height: calc(100% - 142px); margin-top: 20px; }
+    .audit-visual { height: 55vh; min-height: 320px; }
+    .boundary-row { min-height: 112px; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after { scroll-behavior: auto !important; animation-duration: 0.001ms !important; animation-iteration-count: 1 !important; transition-duration: 0.001ms !important; }
+  }
+</style>
